@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Time Finder - 仕様書</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+      line-height: 1.8;
+      color: #333;
+      background: #f5f5f5;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      font-size: 2.2em;
+    }
+    .subtitle {
+      text-align: center;
+      color: #7f8c8d;
+      margin-bottom: 40px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    h2 {
+      color: #3498db;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      font-size: 1.4em;
+    }
+    h3 {
+      color: #2c3e50;
+      margin: 20px 0 10px;
+      font-size: 1.1em;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #555;
+    }
+    tr:hover {
+      background: #fafafa;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 500;
+    }
+    .badge-line {
+      background: #06c755;
+      color: white;
+    }
+    .badge-slack {
+      background: #4a154b;
+      color: white;
+    }
+    .badge-security {
+      background: #27ae60;
+      color: white;
+    }
+    code {
+      background: #f4f4f4;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: 0.9em;
+    }
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .tech-item {
+      background: #ecf0f1;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.9em;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+    .highlight {
+      background: #fff3cd;
+      padding: 15px 20px;
+      border-radius: 8px;
+      border-left: 4px solid #ffc107;
+      margin: 15px 0;
+    }
+    .security-point {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .security-icon {
+      color: #27ae60;
+      font-size: 1.2em;
+    }
+    ul {
+      margin-left: 20px;
+    }
+    li {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Free Time Finder</h1>
+    <p class="subtitle">チーム全員の空き時間を検索・共有するBot</p>
+
+    <!-- 概要 -->
+    <div class="card">
+      <h2>概要</h2>
+      <p>複数人のGoogleカレンダーを参照して、<strong>全員が空いている時間</strong>を自動検索するBotです。MTG調整の手間を大幅に削減できます。</p>
+
+      <div class="two-col" style="margin-top: 20px;">
+        <div>
+          <span class="badge badge-line">LINE版</span>
+          <p style="margin-top: 10px;">LINEで <code>。</code> を送信するだけで空き時間を表示</p>
+        </div>
+        <div>
+          <span class="badge badge-slack">Slack版</span>
+          <p style="margin-top: 10px;">Slackで <code>/cal</code> コマンドを実行してチャンネルに共有</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 機能 -->
+    <div class="card">
+      <h2>機能</h2>
+      <table>
+        <tr>
+          <th>機能</th>
+          <th>説明</th>
+        </tr>
+        <tr>
+          <td>全員の空き時間検索</td>
+          <td>複数のGoogleカレンダーを参照し、全員が空いている時間帯を抽出</td>
+        </tr>
+        <tr>
+          <td>営業時間フィルタ</td>
+          <td>10:00〜19:00の間で空き時間を検索（土日除外）</td>
+        </tr>
+        <tr>
+          <td>最小スロット</td>
+          <td>1時間以上の空きのみ表示</td>
+        </tr>
+        <tr>
+          <td>週間表示</td>
+          <td>今日から7日間の空き時間を一覧表示</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 使い方 -->
+    <div class="card">
+      <h2>使い方</h2>
+
+      <h3><span class="badge badge-line">LINE版</span></h3>
+      <table>
+        <tr>
+          <th>コマンド</th>
+          <th>説明</th>
+        </tr>
+        <tr>
+          <td><code>。</code></td>
+          <td>今週の空き時間を表示</td>
+        </tr>
+        <tr>
+          <td><code>空き</code></td>
+          <td>今週の空き時間を表示</td>
+        </tr>
+        <tr>
+          <td><code>ヘルプ</code></td>
+          <td>使い方を表示</td>
+        </tr>
+      </table>
+
+      <h3><span class="badge badge-slack">Slack版</span></h3>
+      <table>
+        <tr>
+          <th>コマンド</th>
+          <th>説明</th>
+        </tr>
+        <tr>
+          <td><code>/cal</code></td>
+          <td>今週の空き時間をチャンネルに共有</td>
+        </tr>
+        <tr>
+          <td><code>/cal help</code></td>
+          <td>ヘルプを表示</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 出力例 -->
+    <div class="card">
+      <h2>出力例</h2>
+      <pre style="background: #f8f9fa; padding: 20px; border-radius: 8px; overflow-x: auto;">
+【全員の空き時間】
+2/3(月) 10:00-12:00, 15:00-17:00
+2/4(火) 13:00-19:00
+2/5(水) 10:00-11:00, 16:00-19:00
+2/6(木) 10:00-19:00
+2/7(金) 14:00-19:00
+
+ご都合いかがでしょうか？</pre>
+    </div>
+
+    <!-- セキュリティ -->
+    <div class="card">
+      <h2>セキュリティ <span class="badge badge-security">安全</span></h2>
+
+      <div class="highlight">
+        <strong>読み取り専用アクセス</strong><br>
+        このBotはカレンダーの「閲覧のみ」が可能です。予定の追加・編集・削除は<strong>できません</strong>。
+      </div>
+
+      <div class="security-point">
+        <span class="security-icon">✓</span>
+        <div><strong>署名検証</strong> - LINE/Slackからのリクエストを暗号署名で検証</div>
+      </div>
+      <div class="security-point">
+        <span class="security-icon">✓</span>
+        <div><strong>シークレット暗号化</strong> - APIキーはCloudflareで暗号化保存</div>
+      </div>
+      <div class="security-point">
+        <span class="security-icon">✓</span>
+        <div><strong>HTTPS通信</strong> - すべての通信は暗号化</div>
+      </div>
+      <div class="security-point">
+        <span class="security-icon">✓</span>
+        <div><strong>最小権限</strong> - calendar.readonly スコープのみ使用</div>
+      </div>
+    </div>
+
+    <!-- 技術構成 -->
+    <div class="card">
+      <h2>技術構成</h2>
+      <div class="tech-stack">
+        <span class="tech-item">Cloudflare Workers</span>
+        <span class="tech-item">TypeScript</span>
+        <span class="tech-item">Google Calendar API</span>
+        <span class="tech-item">LINE Messaging API</span>
+        <span class="tech-item">Slack API</span>
+      </div>
+
+      <h3>アーキテクチャ</h3>
+      <table>
+        <tr>
+          <th>コンポーネント</th>
+          <th>役割</th>
+        </tr>
+        <tr>
+          <td>Cloudflare Workers</td>
+          <td>サーバーレス実行環境（エッジコンピューティング）</td>
+        </tr>
+        <tr>
+          <td>Google Calendar API</td>
+          <td>カレンダーの予定取得（サービスアカウント認証）</td>
+        </tr>
+        <tr>
+          <td>LINE/Slack API</td>
+          <td>メッセージング（Webhook受信・返信）</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- 環境変数 -->
+    <div class="card">
+      <h2>環境変数（シークレット）</h2>
+
+      <h3><span class="badge badge-line">LINE版</span></h3>
+      <table>
+        <tr>
+          <th>変数名</th>
+          <th>説明</th>
+        </tr>
+        <tr>
+          <td><code>LINE_CHANNEL_SECRET</code></td>
+          <td>LINEチャネルシークレット</td>
+        </tr>
+        <tr>
+          <td><code>LINE_CHANNEL_ACCESS_TOKEN</code></td>
+          <td>LINEチャネルアクセストークン</td>
+        </tr>
+        <tr>
+          <td><code>GOOGLE_SERVICE_ACCOUNT_EMAIL</code></td>
+          <td>サービスアカウントのメールアドレス</td>
+        </tr>
+        <tr>
+          <td><code>GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY</code></td>
+          <td>サービスアカウントの秘密鍵</td>
+        </tr>
+        <tr>
+          <td><code>GOOGLE_CALENDAR_IDS</code></td>
+          <td>カレンダーID（カンマ区切りで複数指定）</td>
+        </tr>
+      </table>
+
+      <h3><span class="badge badge-slack">Slack版</span></h3>
+      <table>
+        <tr>
+          <th>変数名</th>
+          <th>説明</th>
+        </tr>
+        <tr>
+          <td><code>SLACK_BOT_TOKEN</code></td>
+          <td>Bot User OAuth Token（xoxb-...）</td>
+        </tr>
+        <tr>
+          <td><code>SLACK_SIGNING_SECRET</code></td>
+          <td>Slack Signing Secret</td>
+        </tr>
+        <tr>
+          <td><code>GOOGLE_SERVICE_ACCOUNT_EMAIL</code></td>
+          <td>サービスアカウントのメールアドレス</td>
+        </tr>
+        <tr>
+          <td><code>GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY</code></td>
+          <td>サービスアカウントの秘密鍵</td>
+        </tr>
+        <tr>
+          <td><code>GOOGLE_CALENDAR_IDS</code></td>
+          <td>カレンダーID（カンマ区切りで複数指定）</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- フッター -->
+    <div style="text-align: center; color: #95a5a6; margin-top: 40px; font-size: 0.9em;">
+      <p>Free Time Finder - MTG調整をシンプルに</p>
+    </div>
+  </div>
+</body>
+</html>

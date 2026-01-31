@@ -1,0 +1,17 @@
+{
+  "name": "calendar-slack-bot",
+  "version": "1.0.0",
+  "description": "SlackでGoogleカレンダーを管理するBot",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260127.0",
+    "@types/node": "^25.0.10",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.60.0"
+  }
+}
