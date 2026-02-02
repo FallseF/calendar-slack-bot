@@ -36,16 +36,16 @@ export async function getAllBusySlots(
   try {
     const accessToken = await getAccessToken(env);
 
-    // 検索範囲を設定
-    const now = new Date();
-    const jstOffset = 9 * 60 * 60 * 1000;
-    const jstNow = new Date(now.getTime() + jstOffset);
+    // 検索範囲を設定（JSTベース）
+    const jstFormatter = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' });
+    const todayStr = jstFormatter.format(new Date());
 
-    const minDate = new Date(jstNow);
-    minDate.setHours(0, 0, 0, 0);
-    const maxDate = new Date(jstNow);
-    maxDate.setDate(maxDate.getDate() + daysFromNow);
-    maxDate.setHours(23, 59, 59, 999);
+    // JSTの今日0時をUTCで表現
+    const minDate = new Date(todayStr + 'T00:00:00+09:00');
+    // JSTのdaysFromNow日後23:59:59をUTCで表現
+    const maxDateBase = new Date(todayStr + 'T00:00:00+09:00');
+    maxDateBase.setDate(maxDateBase.getDate() + daysFromNow);
+    const maxDate = new Date(maxDateBase.getTime() - 1); // 1ms前（前日の23:59:59.999）
 
     const timeMin = minDate.toISOString();
     const timeMax = maxDate.toISOString();

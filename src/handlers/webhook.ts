@@ -93,30 +93,31 @@ async function processSlashCommand(command: SlackSlashCommand, env: Env): Promis
 /**
  * 空き時間スロットを見つける
  */
-interface FreeTimeSlot {
+export interface FreeTimeSlot {
   date: string;
   startTime: string;
   endTime: string;
 }
 
-function findFreeTimeSlots(busySlots: BusySlot[], days: number): FreeTimeSlot[] {
+export function findFreeTimeSlots(busySlots: BusySlot[], days: number): FreeTimeSlot[] {
   const freeSlots: FreeTimeSlot[] = [];
 
   const WORK_START = 10;  // 10:00
   const WORK_END = 19;    // 19:00
   const MIN_SLOT_MINUTES = 60;  // 最低1時間の空き
 
-  const today = new Date();
-  const jstOffset = 9 * 60 * 60 * 1000;
-  const jstToday = new Date(today.getTime() + jstOffset);
+  // JSTで今日の日付を取得
+  const jstFormatter = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' });
+  const todayStr = jstFormatter.format(new Date());
 
   for (let i = 0; i < days; i++) {
-    const targetDate = new Date(jstToday);
-    targetDate.setDate(targetDate.getDate() + i);
-    const dateStr = targetDate.toISOString().split('T')[0];
+    // 日付を計算（UTCベースで日数を加算してからJSTに変換）
+    const targetDateUTC = new Date(todayStr + 'T00:00:00Z');
+    targetDateUTC.setUTCDate(targetDateUTC.getUTCDate() + i);
+    const dateStr = jstFormatter.format(targetDateUTC);
 
     // 土日はスキップ
-    const dayOfWeek = targetDate.getDay();
+    const dayOfWeek = targetDateUTC.getUTCDay();
     if (dayOfWeek === 0 || dayOfWeek === 6) {
       continue;
     }
@@ -174,13 +175,30 @@ function findFreeTimeSlots(busySlots: BusySlot[], days: number): FreeTimeSlot[] 
   return freeSlots;
 }
 
-function timeToMinutes(time: string): number {
+export function timeToMinutes(time: string): number {
   const [h, m] = time.split(':').map(Number);
   return h * 60 + m;
 }
 
-function minutesToTime(minutes: number): string {
+export function minutesToTime(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+/**
+ * コマンド種別を判定する
+ */
+export type CommandType = 'help' | 'search';
+
+export function parseCommand(rawText: string): CommandType {
+  const text = rawText.trim().toLowerCase();
+
+  // ヘルプコマンド
+  if (text === 'help' || text === 'ヘルプ' || text === 'h') {
+    return 'help';
+  }
+
+  // それ以外は検索（デフォルト動作）
+  return 'search';
 }
